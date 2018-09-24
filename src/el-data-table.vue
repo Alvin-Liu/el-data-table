@@ -570,7 +570,7 @@ export default {
       // query 有可能值为 0
       let params = Object.keys(query)
         .filter(key => {
-          let k = query[key].trim()
+          let k = query[key] && query[key].trim()
           return k !== '' && k !== null && k !== undefined
         })
         .reduce((params, k) => (params += `&${k}=${encodeURI(query[k])}`), '')
