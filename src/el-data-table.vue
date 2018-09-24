@@ -520,7 +520,8 @@ export default {
     }
   },
   mounted() {
-    this.getList()
+    // 第一次请求先获取 searchForm 的参数
+    this.query = this.$refs.searchForm && this.$refs.searchForm.getFormValue() || {}
   },
   watch: {
     query: function(val, old) {
