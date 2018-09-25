@@ -520,8 +520,7 @@ export default {
     }
   },
   mounted() {
-    // 第一次请求先获取 searchForm 的参数
-    this.query = this.$refs.searchForm && this.$refs.searchForm.getFormValue() || {}
+    this.getList()
   },
   watch: {
     query: function(val, old) {
@@ -569,12 +568,16 @@ export default {
       url += `page=${this.page}&size=${size}`
 
       // query 有可能值为 0
+      // TODO Object.values IE11不兼容, 暂时使用Object.keys
       let params = Object.keys(query)
-        .filter(key => {
-          let k = query[key] && query[key].trim()
-          return k !== '' && k !== null && k !== undefined
+        .filter(k => {
+          return query[k] !== '' && query[k] !== null && query[k] !== undefined
         })
-        .reduce((params, k) => (params += `&${k}=${encodeURI(query[k])}`), '')
+        .reduce(
+          (params, k) =>
+            (params += `&${k}=${encodeURI(query[k].toString().trim())}`),
+          ''
+        )
 
       url += params
 
@@ -645,6 +648,7 @@ export default {
       this.query = Object.assign({}, data, customQuery)
     },
     onResetSearch() {
+      // reset后, form里的值会变成 undefined, 在下一次查询会赋值给query
       this.$refs.searchForm.resetFields()
       this.query = {}
 
