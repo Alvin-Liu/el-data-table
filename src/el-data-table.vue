@@ -1,7 +1,7 @@
 <template>
     <div class="el-data-table">
         <!--搜索字段-->
-        <el-form-renderer v-if="searchForm.length > 0" inline :content="searchForm" ref="searchForm">
+        <el-form-renderer v-if="searchForm.length > 0 || !!$slots.search" inline :content="searchForm" ref="searchForm">
           <!--@slot 额外的搜索内容, 当searchForm不满足需求时可以使用-->
             <slot name="search"></slot>
             <el-form-item>
@@ -520,6 +520,15 @@ export default {
     }
   },
   mounted() {
+    let searchForm = this.$refs.searchForm
+
+    if (searchForm) {
+      searchForm.$el.setAttribute('action', 'javascript:;')
+      searchForm.$el.addEventListener('submit', e => {
+        this.onSearch()
+      })
+    }
+
     this.getList()
   },
   watch: {
@@ -575,7 +584,9 @@ export default {
         })
         .reduce(
           (params, k) =>
-            (params += `&${k}=${encodeURI(query[k].toString().trim())}`),
+            (params += `&${k}=${encodeURIComponent(
+              query[k].toString().trim()
+            )}`),
           ''
         )
 
@@ -643,6 +654,7 @@ export default {
       this.$emit('selection-change', val)
     },
     onSearch() {
+      // TODO 应该都调一个方法, 就叫onSearch
       const data = this.$refs.searchForm.getFormValue()
       const customQuery = this.customQuery
       this.query = Object.assign({}, data, customQuery)
