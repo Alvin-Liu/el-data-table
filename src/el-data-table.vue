@@ -5,8 +5,8 @@
           <!--@slot 额外的搜索内容, 当searchForm不满足需求时可以使用-->
             <slot name="search"></slot>
             <el-form-item>
-                <el-button type="primary" @click="onSearch" size="small">查询</el-button>
-                <el-button @click="onResetSearch" size="small">重置</el-button>
+                <el-button native-type="submit" type="primary" @click="getList(1)" size="small">查询</el-button>
+                <el-button @click="resetSearch" size="small">重置</el-button>
             </el-form-item>
         </el-form-renderer>
 
@@ -496,7 +496,6 @@ export default {
   data() {
     return {
       data: [],
-      query: {},
       hasSelect: this.columns.length && this.columns[0].type == 'selection',
       size: this.paginationSize || this.paginationSizes[0],
       page: this.firstPage,
@@ -521,21 +520,24 @@ export default {
   },
   mounted() {
     let searchForm = this.$refs.searchForm
+    let query = history.state || {}
 
     if (searchForm) {
+      // 阻止表单提交的默认行为, 这在element-ui不会出现, 但在storybook里会出现
       searchForm.$el.setAttribute('action', 'javascript:;')
-      searchForm.$el.addEventListener('submit', e => {
-        this.onSearch()
+
+      // 恢复查询条件
+      // 对slot=search无效
+      Object.keys(query).forEach(k => {
+        searchForm.updateValue({id: k, value: query[k]})
       })
     }
 
-    this.getList()
+    this.$nextTick(() => {
+      this.getList()
+    })
   },
   watch: {
-    query: function(val, old) {
-      this.page = this.firstPage
-      this.getList()
-    },
     url: function(val, old) {
       this.page = this.firstPage
       this.getList()
@@ -560,14 +562,23 @@ export default {
     }
   },
   methods: {
-    getList() {
+    getList(isSearch) {
+      let searchForm = this.$refs.searchForm
+      let formQuery = searchForm ? searchForm.getFormValue() : {}
+      // TODO Object.assign IE不支持, 所以后面Object.keys的保守其实是没有必要的。。。
+      let query = Object.assign({}, formQuery, this.customQuery)
+
       let url = this.url
-      let query = Object.assign({}, this.query, this.customQuery)
       let size = this.hasPagination ? this.size : this.noPaginationSize
 
       if (!url) {
         console.warn('DataTable: url 为空, 不发送请求')
         return
+      }
+
+      // 存储query记录, 便于后面恢复
+      if (isSearch > 0) {
+        history.replaceState(query, 'el-data-table search')
       }
 
       // 拼接 query
@@ -576,7 +587,7 @@ export default {
 
       url += `page=${this.page}&size=${size}`
 
-      // query 有可能值为 0
+      // 无效值过滤. query 有可能值为 0, 所以只能这样过滤
       // TODO Object.values IE11不兼容, 暂时使用Object.keys
       let params = Object.keys(query)
         .filter(k => {
@@ -653,16 +664,17 @@ export default {
        */
       this.$emit('selection-change', val)
     },
-    onSearch() {
-      // TODO 应该都调一个方法, 就叫onSearch
-      const data = this.$refs.searchForm.getFormValue()
-      const customQuery = this.customQuery
-      this.query = Object.assign({}, data, customQuery)
-    },
-    onResetSearch() {
+    resetSearch() {
       // reset后, form里的值会变成 undefined, 在下一次查询会赋值给query
       this.$refs.searchForm.resetFields()
-      this.query = {}
+      this.page = this.firstPage
+
+      // 重置
+      history.replaceState(null, 'el-data-table search')
+
+      this.$nextTick(() => {
+        this.getList()
+      })
 
       /**
        * 按下重置按钮后触发,
