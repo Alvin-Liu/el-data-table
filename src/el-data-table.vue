@@ -6,7 +6,7 @@
             <slot name="search"></slot>
             <el-form-item>
                 <!--https://github.com/ElemeFE/element/pull/5920-->
-                <el-button native-type="submit" type="primary" @click="getList(1)" size="small">查询</el-button>
+                <el-button native-type="submit" type="primary" @click="page = firstPage; getList(1)" size="small">查询</el-button>
                 <el-button @click="resetSearch" size="small">重置</el-button>
             </el-form-item>
         </el-form-renderer>
@@ -184,15 +184,16 @@ const defaultId = 'id'
 
 const dialogForm = 'dialogForm'
 
-const semicolon = ';'
-const comma = ','
 const equal = '='
-
-const commaPattern = /,/g
 const equalPattern = /=/g
 
+const valueSeparator = '~'
+const paramSeparator = ','
+
+const valueSeparatorPattern = new RegExp(valueSeparator, 'g')
+
 const queryFlag = 'q='
-const queryPattern = /q=.*;/
+const queryPattern = new RegExp('q=.*' + paramSeparator)
 
 export default {
   name: 'ElDataTable',
@@ -252,6 +253,13 @@ export default {
       default() {
         return []
       }
+    },
+    /**
+     * 路由模式, hash | history || '', 决定了查询参数存放的形式, 设置为空则不存储查询参数
+     */
+    routerMode: {
+      type: String,
+      default: 'hash'
     },
     /**
      * 单选, 适用场景: 不可以批量删除
@@ -510,7 +518,7 @@ export default {
       data: [],
       hasSelect: this.columns.length && this.columns[0].type == 'selection',
       size: this.paginationSize || this.paginationSizes[0],
-      page: this.firstPage,
+      page: 1,
       total: 0,
       loading: false,
       selected: [],
@@ -539,31 +547,31 @@ export default {
       searchForm.$el.setAttribute('action', 'javascript:;')
 
       // 恢复查询条件
-      let matches = location.search.match(queryPattern)
-      let query =
-        (matches && matches[0].substr(2).replace(commaPattern, equal)) || ''
-      let params = qs.parse(query, {delimiter: semicolon})
+      let matches = location.href.match(queryPattern)
 
-      // 对slot=search无效
-      Object.keys(params).forEach(k => {
-        searchForm.updateValue({id: k, value: params[k]})
-      })
+      if (matches) {
+        let query = matches[0].substr(2).replace(valueSeparatorPattern, equal)
+        let params = qs.parse(query, {delimiter: paramSeparator})
+
+        // page size 特殊处理
+        this.page = params.page * 1
+        this.size = params.size * 1
+
+        // 对slot=search无效
+        Object.keys(params).forEach(k => {
+          if (k == 'page' || k == 'size') return
+          searchForm.updateValue({id: k, value: params[k]})
+        })
+      }
     }
 
     this.$nextTick(() => {
       this.getList()
     })
   },
-  destroyed() {
-    history.replaceState(
-      history.state,
-      '',
-      location.href.replace(queryPattern, '')
-    )
-  },
   watch: {
     url: function(val, old) {
-      this.page = this.firstPage
+      this.page = 1
       this.getList()
     },
     dialogVisible: function(val, old) {
@@ -586,7 +594,7 @@ export default {
     }
   },
   methods: {
-    getList(isSearch) {
+    getList(shouldStoreQuery) {
       let searchForm = this.$refs.searchForm
       let formQuery = searchForm ? searchForm.getFormValue() : {}
       // TODO Object.assign IE不支持, 所以后面Object.keys的保守其实是没有必要的。。。
@@ -605,7 +613,11 @@ export default {
       if (url.indexOf('?') > -1) url += '&'
       else url += '?'
 
-      params += `page=${this.page}&size=${size}`
+      // 根据偏移值计算接口正确的页数
+      let pageOffset = this.firstPage - 1
+      let page = this.page + pageOffset
+
+      params += `page=${page}&size=${size}`
 
       // 无效值过滤. query 有可能值为 0, 所以只能这样过滤
       // TODO Object.values IE11不兼容, 暂时使用Object.keys
@@ -662,21 +674,37 @@ export default {
         })
 
       // 存储query记录, 便于后面恢复
-      if (isSearch > 0) {
+      if (this.routerMode && shouldStoreQuery > 0) {
         let newUrl = ''
         let searchQuery =
           queryFlag +
-          params.replace(/&/g, semicolon).replace(equalPattern, comma) +
-          semicolon
+          params
+            .replace(/&/g, paramSeparator)
+            .replace(equalPattern, valueSeparator) +
+          paramSeparator
 
         // 非第一次查询
-        if (location.search.indexOf(queryFlag) > -1) {
+        if (location.href.indexOf(queryFlag) > -1) {
           newUrl = location.href.replace(queryPattern, searchQuery)
+        } else if (this.routerMode == 'hash') {
+          let search =
+            location.hash.indexOf('?') > -1
+              ? `&${searchQuery}`
+              : `?${searchQuery}`
+          newUrl =
+            location.origin +
+            location.pathname +
+            location.search +
+            location.hash +
+            search
         } else {
-          let search = location.search
-            ? location.search + `&${searchQuery}`
-            : `?${searchQuery}`
-          newUrl = location.origin + location.pathname + search + location.hash
+          let search = location.search ? `&${searchQuery}` : `?${searchQuery}`
+          newUrl =
+            location.origin +
+            location.pathname +
+            location.search +
+            search +
+            location.hash
         }
 
         history.pushState(history.state, 'el-data-table search', newUrl)
@@ -685,14 +713,15 @@ export default {
     handleSizeChange(val) {
       if (this.size === val) return
 
+      this.page = this.firstPage
       this.size = val
-      this.getList()
+      this.getList(true)
     },
     handleCurrentChange(val) {
       if (this.page === val) return
 
       this.page = val
-      this.getList()
+      this.getList(true)
     },
     handleSelectionChange(val) {
       this.selected = val
