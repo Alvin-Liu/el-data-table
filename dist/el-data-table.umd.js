@@ -45,7 +45,7 @@
   var queryFlag = 'q=';
   var queryPattern = new RegExp('q=.*' + paramSeparator);
 
-  var component = {render: function(){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"el-data-table"},[(_vm.searchForm.length > 0 || !!_vm.$slots.search)?_c('el-form-renderer',{ref:"searchForm",attrs:{"inline":"","content":_vm.searchForm}},[_vm._t("search"),_vm._v(" "),_c('el-form-item',[_c('el-button',{attrs:{"native-type":"submit","type":"primary","size":"small"},on:{"click":_vm.search}},[_vm._v("查询")]),_vm._v(" "),_c('el-button',{attrs:{"size":"small"},on:{"click":_vm.resetSearch}},[_vm._v("重置")])],1)],2):_vm._e(),_vm._v(" "),(_vm.hasNew || _vm.hasDelete || _vm.headerButtons.length > 0 )?_c('el-form',[_c('el-form-item',[(_vm.hasNew)?_c('el-button',{attrs:{"type":"primary","size":"small"},on:{"click":_vm.onDefaultNew}},[_vm._v("新增")]):_vm._e(),_vm._v(" "),_vm._l((_vm.headerButtons),function(btn,i){return ('show' in btn ? btn.show(_vm.selected) : true)?_c('el-button',_vm._b({key:i,attrs:{"disabled":'disabled' in btn ? btn.disabled(_vm.selected) : false,"size":"small"},on:{"click":function($event){btn.atClick(_vm.selected);}}},'el-button',btn,false),[_vm._v(_vm._s(btn.text))]):_vm._e()}),_vm._v(" "),(_vm.hasSelect && _vm.hasDelete)?_c('el-button',{attrs:{"type":"danger","size":"small","disabled":_vm.single ? (!_vm.selected.length || _vm.selected.length > 1) : !_vm.selected.length},on:{"click":function($event){_vm.onDefaultDelete($event);}}},[_vm._v("删除")]):_vm._e()],2)],1):_vm._e(),_vm._v(" "),_c('el-table',_vm._b({directives:[{name:"loading",rawName:"v-loading",value:(_vm.loading),expression:"loading"}],ref:"table",attrs:{"data":_vm.data,"row-style":_vm.showRow},on:{"selection-change":_vm.handleSelectionChange}},'el-table',_vm.tableAttrs,false),[(_vm.isTree)?[(_vm.hasSelect)?[_c('el-table-column',_vm._b({key:"selection-key"},'el-table-column',_vm.columns[0],false)),_vm._v(" "),_c('el-table-column',_vm._b({key:"tree-ctrl",scopedSlots:_vm._u([{key:"default",fn:function(scope){return [_vm._l((scope.row._level),function(space){return (_vm.isTree)?_c('span',{key:space,staticClass:"ms-tree-space"}):_vm._e()}),_vm._v(" "),(_vm.isTree && _vm.iconShow(scope.$index, scope.row))?_c('span',{staticClass:"tree-ctrl",on:{"click":function($event){_vm.toggleExpanded(scope.$index);}}},[(!scope.row._expanded)?_c('i',{staticClass:"el-icon-plus"}):_c('i',{staticClass:"el-icon-minus"})]):_vm._e(),_vm._v(" "+_vm._s(scope.row[_vm.columns[1].prop])+" ")]}}])},'el-table-column',_vm.columns[1],false)),_vm._v(" "),_vm._l((_vm.columns.filter(function (c, i) { return i !== 0 && i !== 1; })),function(col){return _c('el-table-column',_vm._b({key:col.prop},'el-table-column',col,false))})]:[_c('el-table-column',_vm._b({key:"tree-ctrl",scopedSlots:_vm._u([{key:"default",fn:function(scope){return [_vm._l((scope.row._level),function(space){return (_vm.isTree)?_c('span',{key:space,staticClass:"ms-tree-space"}):_vm._e()}),_vm._v(" "),(_vm.isTree && _vm.iconShow(scope.$index, scope.row))?_c('span',{staticClass:"tree-ctrl",on:{"click":function($event){_vm.toggleExpanded(scope.$index);}}},[(!scope.row._expanded)?_c('i',{staticClass:"el-icon-plus"}):_c('i',{staticClass:"el-icon-minus"})]):_vm._e(),_vm._v(" "+_vm._s(scope.row[_vm.columns[0].prop])+" ")]}}])},'el-table-column',_vm.columns[0],false)),_vm._v(" "),_vm._l((_vm.columns.filter(function (c, i) { return i !== 0; })),function(col){return _c('el-table-column',_vm._b({key:col.prop},'el-table-column',col,false))})]]:_vm._l((_vm.columns),function(col){return _c('el-table-column',_vm._b({key:col.prop},'el-table-column',col,false))}),_vm._v(" "),(_vm.hasOperation)?_c('el-table-column',_vm._b({attrs:{"label":"操作"},scopedSlots:_vm._u([{key:"default",fn:function(scope){return [(_vm.isTree && _vm.hasNew)?_c('el-button',{attrs:{"type":"primary","size":"small"},on:{"click":function($event){_vm.onDefaultNew(scope.row);}}},[_vm._v("新增")]):_vm._e(),_vm._v(" "),(_vm.hasEdit)?_c('el-button',{attrs:{"size":"small"},on:{"click":function($event){_vm.onDefaultEdit(scope.row);}}},[_vm._v(" 修改 ")]):_vm._e(),_vm._v(" "),(_vm.hasView)?_c('el-button',{attrs:{"type":"info","size":"small"},on:{"click":function($event){_vm.onDefaultView(scope.row);}}},[_vm._v(" 查看 ")]):_vm._e(),_vm._v(" "),_vm._l((_vm.extraButtons),function(btn,i){return ('show' in btn ? btn.show(scope.row) : true)?_c('el-button',_vm._b({key:i,attrs:{"size":"small"},on:{"click":function($event){btn.atClick(scope.row);}}},'el-button',btn,false),[_vm._v(" "+_vm._s(btn.text)+" ")]):_vm._e()}),_vm._v(" "),(!_vm.hasSelect && _vm.hasDelete && _vm.canDelete(scope.row))?_c('el-button',{attrs:{"type":"danger","size":"small"},on:{"click":function($event){_vm.onDefaultDelete(scope.row);}}},[_vm._v(" 删除 ")]):_vm._e()]}}])},'el-table-column',_vm.operationAttrs,false)):_vm._e(),_vm._v(" "),_vm._t("default")],2),_vm._v(" "),(_vm.hasPagination)?_c('el-pagination',{staticStyle:{"text-align":"right","padding":"10px 0"},attrs:{"current-page":_vm.page,"page-sizes":_vm.paginationSizes,"page-size":_vm.size,"total":_vm.total,"layout":_vm.paginationLayout},on:{"size-change":_vm.handleSizeChange,"current-change":_vm.handleCurrentChange}}):_vm._e(),_vm._v(" "),(_vm.hasDialog)?_c('el-dialog',{attrs:{"title":_vm.dialogTitle,"visible":_vm.dialogVisible},on:{"update:visible":function($event){_vm.dialogVisible=$event;}}},[_c('el-form-renderer',_vm._b({ref:"dialogForm",attrs:{"content":_vm.form,"disabled":_vm.isView}},'el-form-renderer',_vm.formAttrs,false),[_vm._t("form")],2),_vm._v(" "),_c('div',{directives:[{name:"show",rawName:"v-show",value:(!_vm.isView),expression:"!isView"}],attrs:{"slot":"footer"},slot:"footer"},[_c('el-button',{attrs:{"size":"small"},on:{"click":_vm.cancel}},[_vm._v("取 消")]),_vm._v(" "),_c('el-button',{directives:[{name:"loading",rawName:"v-loading",value:(_vm.confirmLoading),expression:"confirmLoading"}],attrs:{"type":"primary","size":"small"},on:{"click":_vm.confirm}},[_vm._v("确 定")])],1)],1):_vm._e()],1)},staticRenderFns: [],
+  var component = {render: function(){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"el-data-table"},[(_vm.searchForm.length > 0 || !!_vm.$slots.search)?_c('el-form-renderer',{ref:"searchForm",attrs:{"inline":"","content":_vm.searchForm}},[_vm._t("search"),_vm._v(" "),_c('el-form-item',[_c('el-button',{attrs:{"native-type":"submit","type":"primary","size":"small"},on:{"click":_vm.search}},[_vm._v("查询")]),_vm._v(" "),_c('el-button',{attrs:{"size":"small"},on:{"click":_vm.resetSearch}},[_vm._v("重置")])],1)],2):_vm._e(),_vm._v(" "),(_vm.hasNew || _vm.hasDelete || _vm.headerButtons.length > 0 )?_c('el-form',[_c('el-form-item',[(_vm.hasNew)?_c('el-button',{attrs:{"type":"primary","size":"small"},on:{"click":_vm.onDefaultNew}},[_vm._v("新增")]):_vm._e(),_vm._v(" "),_vm._l((_vm.headerButtons),function(btn,i){return ('show' in btn ? btn.show(_vm.selected) : true)?_c('el-button',_vm._b({directives:[{name:"loading",rawName:"v-loading",value:(_vm.customButtonsLoading),expression:"customButtonsLoading"}],key:i,attrs:{"disabled":'disabled' in btn ? btn.disabled(_vm.selected) : false,"size":"small"},on:{"click":function($event){_vm.onCustomButtonsClick(btn.atClick, _vm.selected);}}},'el-button',btn,false),[_vm._v(_vm._s(btn.text))]):_vm._e()}),_vm._v(" "),(_vm.hasSelect && _vm.hasDelete)?_c('el-button',{attrs:{"type":"danger","size":"small","disabled":_vm.single ? (!_vm.selected.length || _vm.selected.length > 1) : !_vm.selected.length},on:{"click":function($event){_vm.onDefaultDelete($event);}}},[_vm._v("删除")]):_vm._e()],2)],1):_vm._e(),_vm._v(" "),_c('el-table',_vm._b({directives:[{name:"loading",rawName:"v-loading",value:(_vm.loading),expression:"loading"}],ref:"table",attrs:{"data":_vm.data,"row-style":_vm.showRow},on:{"selection-change":_vm.handleSelectionChange}},'el-table',_vm.tableAttrs,false),[(_vm.isTree)?[(_vm.hasSelect)?[_c('el-table-column',_vm._b({key:"selection-key"},'el-table-column',_vm.columns[0],false)),_vm._v(" "),_c('el-table-column',_vm._b({key:"tree-ctrl",scopedSlots:_vm._u([{key:"default",fn:function(scope){return [_vm._l((scope.row._level),function(space){return (_vm.isTree)?_c('span',{key:space,staticClass:"ms-tree-space"}):_vm._e()}),_vm._v(" "),(_vm.isTree && _vm.iconShow(scope.$index, scope.row))?_c('span',{staticClass:"tree-ctrl",on:{"click":function($event){_vm.toggleExpanded(scope.$index);}}},[(!scope.row._expanded)?_c('i',{staticClass:"el-icon-plus"}):_c('i',{staticClass:"el-icon-minus"})]):_vm._e(),_vm._v(" "+_vm._s(scope.row[_vm.columns[1].prop])+" ")]}}])},'el-table-column',_vm.columns[1],false)),_vm._v(" "),_vm._l((_vm.columns.filter(function (c, i) { return i !== 0 && i !== 1; })),function(col){return _c('el-table-column',_vm._b({key:col.prop},'el-table-column',col,false))})]:[_c('el-table-column',_vm._b({key:"tree-ctrl",scopedSlots:_vm._u([{key:"default",fn:function(scope){return [_vm._l((scope.row._level),function(space){return (_vm.isTree)?_c('span',{key:space,staticClass:"ms-tree-space"}):_vm._e()}),_vm._v(" "),(_vm.isTree && _vm.iconShow(scope.$index, scope.row))?_c('span',{staticClass:"tree-ctrl",on:{"click":function($event){_vm.toggleExpanded(scope.$index);}}},[(!scope.row._expanded)?_c('i',{staticClass:"el-icon-plus"}):_c('i',{staticClass:"el-icon-minus"})]):_vm._e(),_vm._v(" "+_vm._s(scope.row[_vm.columns[0].prop])+" ")]}}])},'el-table-column',_vm.columns[0],false)),_vm._v(" "),_vm._l((_vm.columns.filter(function (c, i) { return i !== 0; })),function(col){return _c('el-table-column',_vm._b({key:col.prop},'el-table-column',col,false))})]]:_vm._l((_vm.columns),function(col){return _c('el-table-column',_vm._b({key:col.prop},'el-table-column',col,false))}),_vm._v(" "),(_vm.hasOperation)?_c('el-table-column',_vm._b({attrs:{"label":"操作"},scopedSlots:_vm._u([{key:"default",fn:function(scope){return [(_vm.isTree && _vm.hasNew)?_c('el-button',{attrs:{"type":"primary","size":"small"},on:{"click":function($event){_vm.onDefaultNew(scope.row);}}},[_vm._v("新增")]):_vm._e(),_vm._v(" "),(_vm.hasEdit)?_c('el-button',{attrs:{"size":"small"},on:{"click":function($event){_vm.onDefaultEdit(scope.row);}}},[_vm._v(" 修改 ")]):_vm._e(),_vm._v(" "),(_vm.hasView)?_c('el-button',{attrs:{"type":"info","size":"small"},on:{"click":function($event){_vm.onDefaultView(scope.row);}}},[_vm._v(" 查看 ")]):_vm._e(),_vm._v(" "),_vm._l((_vm.extraButtons),function(btn,i){return ('show' in btn ? btn.show(scope.row) : true)?_c('el-button',_vm._b({directives:[{name:"loading",rawName:"v-loading",value:(_vm.customButtonsLoading),expression:"customButtonsLoading"}],key:i,attrs:{"size":"small"},on:{"click":function($event){_vm.onCustomButtonsClick(btn.atClick, scope.row);}}},'el-button',btn,false),[_vm._v(" "+_vm._s(btn.text)+" ")]):_vm._e()}),_vm._v(" "),(!_vm.hasSelect && _vm.hasDelete && _vm.canDelete(scope.row))?_c('el-button',{attrs:{"type":"danger","size":"small"},on:{"click":function($event){_vm.onDefaultDelete(scope.row);}}},[_vm._v(" 删除 ")]):_vm._e()]}}])},'el-table-column',_vm.operationAttrs,false)):_vm._e(),_vm._v(" "),_vm._t("default")],2),_vm._v(" "),(_vm.hasPagination)?_c('el-pagination',{staticStyle:{"text-align":"right","padding":"10px 0"},attrs:{"current-page":_vm.page,"page-sizes":_vm.paginationSizes,"page-size":_vm.size,"total":_vm.total,"layout":_vm.paginationLayout},on:{"size-change":_vm.handleSizeChange,"current-change":_vm.handleCurrentChange}}):_vm._e(),_vm._v(" "),(_vm.hasDialog)?_c('el-dialog',{attrs:{"title":_vm.dialogTitle,"visible":_vm.dialogVisible},on:{"update:visible":function($event){_vm.dialogVisible=$event;}}},[_c('el-form-renderer',_vm._b({ref:"dialogForm",attrs:{"content":_vm.form,"disabled":_vm.isView}},'el-form-renderer',_vm.formAttrs,false),[_vm._t("form")],2),_vm._v(" "),_c('div',{directives:[{name:"show",rawName:"v-show",value:(!_vm.isView),expression:"!isView"}],attrs:{"slot":"footer"},slot:"footer"},[_c('el-button',{attrs:{"size":"small"},on:{"click":_vm.cancel}},[_vm._v("取 消")]),_vm._v(" "),_c('el-button',{directives:[{name:"loading",rawName:"v-loading",value:(_vm.confirmLoading),expression:"confirmLoading"}],attrs:{"type":"primary","size":"small"},on:{"click":_vm.confirm}},[_vm._v("确 定")])],1)],1):_vm._e()],1)},staticRenderFns: [],
     name: 'ElDataTable',
     props: {
       /**
@@ -135,8 +135,9 @@
         default: true
       },
       /**
-       * 操作列的自定义按钮, 渲染的是element-ui的button, 支持属性
-       * type: '', text: '', atClick: row => {}, show: row => {返回true时显示}
+       * 操作列的自定义按钮, 渲染的是element-ui的button, 支持包括style在内的以下属性:
+       * {type: '', text: '', atClick: row => Promise.resolve(), show: row => return true时显示 }
+       * 点击事件 row参数 表示当前行数据, 需要返回Promise, 默认点击后会刷新table, resolve(false) 则不刷新
        */
       extraButtons: {
         type: Array,
@@ -145,8 +146,9 @@
         }
       },
       /**
-       * 头部的自定义按钮, 渲染的是element-ui的button, 支持属性
-       * type: '', text: '', atClick: row => {}, show: row => {返回true时显示}, disabled: selected => {返回true时禁用}
+       * 头部的自定义按钮, 渲染的是element-ui的button, 支持包括style在内的以下属性:
+       * {type: '', text: '', atClick: selected => Promise.resolve(), show: selected => return true时显示, disabled: selected => return true时禁用}
+       * 点击事件 selected参数 表示选中行所组成的数组, 函数需要返回Promise, 默认点击后会刷新table, resolve(false) 则不刷新
        */
       headerButtons: {
         type: Array,
@@ -192,19 +194,22 @@
         }
       },
       /**
-       * 点击新增按钮时的方法, 当默认新增方法不满足需求时使用
+       * 点击新增按钮时的方法, 当默认新增方法不满足需求时使用, 需要返回promise
+       * 参数(data, row) data 是form表单的数据, row 是当前行的数据, 只有isTree为true时, 点击操作列的新增按钮才会有值
        */
       onNew: {
         type: Function
       },
       /**
-       * 点击修改按钮时的方法, 当默认新增方法不满足需求时使用
+       * 点击修改按钮时的方法, 当默认修改方法不满足需求时使用, 需要返回promise
+       * 参数(data, row) data 是form表单的数据, row 是当前行的数据
        */
       onEdit: {
         type: Function
       },
       /**
-       * 点击删除按钮时的方法, 当默认新增方法不满足需求时使用
+       * 点击删除按钮时的方法, 当默认删除方法不满足需求时使用, 需要返回promise
+       * 多选时, 参数为selected, 代表选中的行组成的数组; 非多选时参数为row, 代表单行的数据
        */
       onDelete: {
         type: Function
@@ -354,12 +359,13 @@
         type: Object
       },
       /**
-       * 在新增/修改弹窗 点击确认时调用，返回false则不会继续执行confirm逻辑
+       * 在新增/修改弹窗 点击确认时调用，返回Promise, 如果reject, 则不会发送新增/修改请求
+       * 参数: (data, isNew) data为表单数据, isNew true 表示是新增弹窗, false 为 编辑弹窗
        */
       beforeConfirm: {
         type: Function,
         default: function default$11() {
-          return true
+          return Promise.resolve()
         }
       },
       /**
@@ -383,6 +389,8 @@
         loading: false,
         selected: [],
 
+        customButtonsLoading: false,
+
         //弹窗
         dialogTitle: this.dialogNewTitle,
         dialogVisible: false,
@@ -396,6 +404,32 @@
         // 初始的customQuery值, 重置查询时, 会用到
         // JSON.stringify是为了后面深拷贝作准备
         initCustomQuery: JSON.stringify(this.customQuery)
+      }
+    },
+    watch: {
+      url: function(val, old) {
+        this.page = defaultFirstPage;
+        this.getList();
+      },
+      dialogVisible: function(val, old) {
+        var this$1 = this;
+
+        if (!val) {
+          this.isNew = false;
+          this.isEdit = false;
+          this.isView = false;
+          this.confirmLoading = false;
+
+          this.$refs[dialogForm].resetFields();
+
+          // fix element bug https://github.com/ElemeFE/element/issues/8615
+          // 重置select 为multiple==true时值为[undefined]
+          this.form.forEach(function (entry) {
+            if (entry.$type === 'select' && entry.$el && entry.$el.multiple) {
+              this$1.$refs[dialogForm].updateValue({id: entry.$id, value: []});
+            }
+          });
+        }
       }
     },
     mounted: function mounted() {
@@ -430,32 +464,6 @@
       this.$nextTick(function () {
         this$1.getList();
       });
-    },
-    watch: {
-      url: function(val, old) {
-        this.page = defaultFirstPage;
-        this.getList();
-      },
-      dialogVisible: function(val, old) {
-        var this$1 = this;
-
-        if (!val) {
-          this.isNew = false;
-          this.isEdit = false;
-          this.isView = false;
-          this.confirmLoading = false;
-
-          this.$refs[dialogForm].resetFields();
-
-          // fix element bug https://github.com/ElemeFE/element/issues/8615
-          // 重置select 为multiple==true时值为[undefined]
-          this.form.forEach(function (entry) {
-            if (entry.$type === 'select' && entry.$el && entry.$el.multiple) {
-              this$1.$refs[dialogForm].updateValue({id: entry.$id, value: []});
-            }
-          });
-        }
-      }
     },
     methods: {
       getList: function getList(shouldStoreQuery) {
@@ -509,7 +517,8 @@
 
             // 不分页
             if (!this$1.hasPagination) {
-              data = _get(res, dataPath) || _get(res, noPaginationDataPath) || [];
+              data =
+                _get(res, this$1.dataPath) || _get(res, noPaginationDataPath) || [];
             } else {
               data = _get(res, this$1.dataPath) || [];
               this$1.total = _get(res, this$1.totalPath);
@@ -648,15 +657,6 @@
       onDefaultNew: function onDefaultNew(row) {
         if ( row === void 0 ) row = {};
 
-        if (this.onNew) {
-          return this.onNew(row)
-        }
-        /**
-         * 点击新增 触发new事件
-         * @event new
-         */
-        this.$emit('new', row);
-
         this.row = row;
         this.isNew = true;
         this.isEdit = false;
@@ -667,21 +667,13 @@
       onDefaultView: function onDefaultView(row) {
         var this$1 = this;
 
-        if (this.onView) {
-          return this.onView(row)
-        }
-        /**
-         * 点击查看 触发view事件
-         * @event view
-         */
-        this.$emit('view', row);
-
         this.row = row;
         this.isView = true;
         this.isNew = false;
         this.isEdit = false;
         this.dialogTitle = this.dialogViewTitle;
         this.dialogVisible = true;
+
         // 给表单填充值
         this.$nextTick(function () {
           this$1.form.forEach(function (entry) {
@@ -693,15 +685,6 @@
       },
       onDefaultEdit: function onDefaultEdit(row) {
         var this$1 = this;
-
-        if (this.onEdit) {
-          return this.onEdit(row)
-        }
-        /**
-         * 点击修改 触发edit事件
-         * @event edit
-         */
-        this.$emit('edit', row);
 
         this.row = row;
         this.isEdit = true;
@@ -725,15 +708,13 @@
       confirm: function confirm() {
         var this$1 = this;
 
-        if (!this.beforeConfirm()) { return }
+        if (this.isView) {
+          this.cancel();
+          return
+        }
 
         this.$refs[dialogForm].validate(function (valid) {
           if (!valid) { return false }
-
-          if (this$1.isView) {
-            this$1.cancel();
-            return
-          }
 
           var data = Object.assign(
             {},
@@ -741,47 +722,87 @@
             this$1.extraParams
           );
 
-          // 默认新增
-          var method = 'post';
-          var url = this$1.url + '';
-
-          if (this$1.isEdit) {
-            method = 'put';
-            url += "/" + (this$1.row[this$1.id]);
-          }
-
           if (this$1.isTree) {
             if (this$1.isNew)
               { data[this$1.treeParentKey] = this$1.row[this$1.treeParentValue]; }
-            else if (this$1.isEdit)
-              { data[this$1.treeParentKey] = this$1.row[this$1.treeParentKey]; }
+            else { data[this$1.treeParentKey] = this$1.row[this$1.treeParentKey]; }
           }
 
-          this$1.confirmLoading = true;
-
-          this$1.$axios[method](url, data)
+          this$1.beforeConfirm(data, this$1.isNew)
             .then(function (resp) {
-              this$1.getList();
-              this$1.showMessage(true);
-              this$1.cancel();
+              var condiction = 'isNew';
+              var customMethod = 'onNew';
+
+              if (this$1.isEdit) {
+                condiction = 'isEdit';
+                customMethod = 'onEdit';
+              }
+
+              if (this$1[condiction] && this$1[customMethod]) {
+                this$1[customMethod](data, this$1.row)
+                  .then(function (resp) {
+                    this$1.getList();
+                    this$1.showMessage(true);
+                    this$1.cancel();
+                  })
+                  .catch(function (e) {});
+                return
+              }
+
+              // 默认新增/修改逻辑
+              var method = 'post';
+              var url = this$1.url + '';
+
+              if (this$1.isEdit) {
+                method = 'put';
+                url += "/" + (this$1.row[this$1.id]);
+              }
+
+              this$1.confirmLoading = true;
+
+              this$1.$axios[method](url, data)
+                .then(function (resp) {
+                  this$1.getList();
+                  this$1.showMessage(true);
+                  this$1.cancel();
+                })
+                .catch(function (err) {
+                  this$1.confirmLoading = false;
+                });
             })
-            .catch(function (err) {
-              this$1.confirmLoading = false;
-            });
+            .catch(function (e) {});
         });
       },
       onDefaultDelete: function onDefaultDelete(row) {
         var this$1 = this;
 
-        if (this.onDelete) {
-          return this.onDelete(row)
-        }
         this.$confirm('确认删除吗', '提示', {
           type: 'warning',
           beforeClose: function (action, instance, done) {
             if (action == 'confirm') {
               instance.confirmButtonLoading = true;
 
+              if (this$1.onDelete) {
+                this$1.onDelete(
+                  this$1.hasSelect
+                    ? !this$1.single
+                      ? this$1.selected
+                      : this$1.selected[0]
+                    : row
+                )
+                  .then(function (resp) {
+                    this$1.showMessage(true);
+                    done();
+                    this$1.getList();
+                  })
+                  .catch(function (e) {})
+                  .finally(function (e) {
+                    instance.confirmButtonLoading = false;
+                  });
+                return
+              }
+
+              // 默认删除逻辑
               // 单个删除
               if (!this$1.hasSelect) {
                 this$1.$axios
@@ -816,6 +837,23 @@
         }).catch(function (er) {
           /*取消*/
         });
+      },
+      onCustomButtonsClick: function onCustomButtonsClick(fn, parameter) {
+        var this$1 = this;
+
+        if (!fn) { return }
+
+        this.customButtonsLoading = true;
+
+        fn(parameter)
+          .then(function (flag) {
+            if (flag === false) { return }
+            this$1.getList();
+          })
+          .catch(function (e) {})
+          .finally(function (e) {
+            this$1.customButtonsLoading = false;
+          });
       },
       // 树形table相关
       // https://github.com/PanJiaChen/vue-element-admin/tree/master/src/components/TreeTable

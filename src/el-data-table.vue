@@ -18,7 +18,8 @@
                 <el-button v-for="(btn, i) in headerButtons"
                            v-if="'show' in btn ? btn.show(selected) : true"
                            :disabled="'disabled' in btn ? btn.disabled(selected) : false"
-                           @click="btn.atClick(selected)"
+                           @click="onCustomButtonsClick(btn.atClick, selected)"
+                           v-loading="customButtonsLoading"
                            v-bind="btn"
                            :key="i"
                            size="small" >{{btn.text}}</el-button>
@@ -116,7 +117,9 @@
                     </el-button>
                     <el-button v-for="(btn, i) in extraButtons"
                                v-if="'show' in btn ? btn.show(scope.row) : true"
-                               v-bind="btn" @click="btn.atClick(scope.row)" :key="i" size="small">
+                               v-bind="btn" @click="onCustomButtonsClick(btn.atClick, scope.row)" :key="i" size="small"
+                               v-loading="customButtonsLoading"
+                    >
                         {{btn.text}}
                     </el-button>
                     <el-button v-if="!hasSelect && hasDelete && canDelete(scope.row)" type="danger" size="small"
@@ -287,8 +290,9 @@ export default {
       default: true
     },
     /**
-     * 操作列的自定义按钮, 渲染的是element-ui的button, 支持属性
-     * type: '', text: '', atClick: row => {}, show: row => {返回true时显示}
+     * 操作列的自定义按钮, 渲染的是element-ui的button, 支持包括style在内的以下属性:
+     * {type: '', text: '', atClick: row => Promise.resolve(), show: row => return true时显示 }
+     * 点击事件 row参数 表示当前行数据, 需要返回Promise, 默认点击后会刷新table, resolve(false) 则不刷新
      */
     extraButtons: {
       type: Array,
@@ -297,8 +301,9 @@ export default {
       }
     },
     /**
-     * 头部的自定义按钮, 渲染的是element-ui的button, 支持属性
-     * type: '', text: '', atClick: row => {}, show: row => {返回true时显示}, disabled: selected => {返回true时禁用}
+     * 头部的自定义按钮, 渲染的是element-ui的button, 支持包括style在内的以下属性:
+     * {type: '', text: '', atClick: selected => Promise.resolve(), show: selected => return true时显示, disabled: selected => return true时禁用}
+     * 点击事件 selected参数 表示选中行所组成的数组, 函数需要返回Promise, 默认点击后会刷新table, resolve(false) 则不刷新
      */
     headerButtons: {
       type: Array,
@@ -344,19 +349,22 @@ export default {
       }
     },
     /**
-     * 点击新增按钮时的方法, 当默认新增方法不满足需求时使用
+     * 点击新增按钮时的方法, 当默认新增方法不满足需求时使用, 需要返回promise
+     * 参数(data, row) data 是form表单的数据, row 是当前行的数据, 只有isTree为true时, 点击操作列的新增按钮才会有值
      */
     onNew: {
       type: Function
     },
     /**
-     * 点击修改按钮时的方法, 当默认新增方法不满足需求时使用
+     * 点击修改按钮时的方法, 当默认修改方法不满足需求时使用, 需要返回promise
+     * 参数(data, row) data 是form表单的数据, row 是当前行的数据
      */
     onEdit: {
       type: Function
     },
     /**
-     * 点击删除按钮时的方法, 当默认新增方法不满足需求时使用
+     * 点击删除按钮时的方法, 当默认删除方法不满足需求时使用, 需要返回promise
+     * 多选时, 参数为selected, 代表选中的行组成的数组; 非多选时参数为row, 代表单行的数据
      */
     onDelete: {
       type: Function
@@ -506,12 +514,13 @@ export default {
       type: Object
     },
     /**
-     * 在新增/修改弹窗 点击确认时调用，返回false则不会继续执行confirm逻辑
+     * 在新增/修改弹窗 点击确认时调用，返回Promise, 如果reject, 则不会发送新增/修改请求
+     * 参数: (data, isNew) data为表单数据, isNew true 表示是新增弹窗, false 为 编辑弹窗
      */
     beforeConfirm: {
       type: Function,
       default() {
-        return true
+        return Promise.resolve()
       }
     },
     /**
@@ -535,6 +544,8 @@ export default {
       loading: false,
       selected: [],
 
+      customButtonsLoading: false,
+
       //弹窗
       dialogTitle: this.dialogNewTitle,
       dialogVisible: false,
@@ -548,6 +559,30 @@ export default {
       // 初始的customQuery值, 重置查询时, 会用到
       // JSON.stringify是为了后面深拷贝作准备
       initCustomQuery: JSON.stringify(this.customQuery)
+    }
+  },
+  watch: {
+    url: function(val, old) {
+      this.page = defaultFirstPage
+      this.getList()
+    },
+    dialogVisible: function(val, old) {
+      if (!val) {
+        this.isNew = false
+        this.isEdit = false
+        this.isView = false
+        this.confirmLoading = false
+
+        this.$refs[dialogForm].resetFields()
+
+        // fix element bug https://github.com/ElemeFE/element/issues/8615
+        // 重置select 为multiple==true时值为[undefined]
+        this.form.forEach(entry => {
+          if (entry.$type === 'select' && entry.$el && entry.$el.multiple) {
+            this.$refs[dialogForm].updateValue({id: entry.$id, value: []})
+          }
+        })
+      }
     }
   },
   mounted() {
@@ -580,30 +615,6 @@ export default {
     this.$nextTick(() => {
       this.getList()
     })
-  },
-  watch: {
-    url: function(val, old) {
-      this.page = defaultFirstPage
-      this.getList()
-    },
-    dialogVisible: function(val, old) {
-      if (!val) {
-        this.isNew = false
-        this.isEdit = false
-        this.isView = false
-        this.confirmLoading = false
-
-        this.$refs[dialogForm].resetFields()
-
-        // fix element bug https://github.com/ElemeFE/element/issues/8615
-        // 重置select 为multiple==true时值为[undefined]
-        this.form.forEach(entry => {
-          if (entry.$type === 'select' && entry.$el && entry.$el.multiple) {
-            this.$refs[dialogForm].updateValue({id: entry.$id, value: []})
-          }
-        })
-      }
-    }
   },
   methods: {
     getList(shouldStoreQuery) {
@@ -656,7 +667,8 @@ export default {
 
           // 不分页
           if (!this.hasPagination) {
-            data = _get(res, dataPath) || _get(res, noPaginationDataPath) || []
+            data =
+              _get(res, this.dataPath) || _get(res, noPaginationDataPath) || []
           } else {
             data = _get(res, this.dataPath) || []
             this.total = _get(res, this.totalPath)
@@ -789,15 +801,6 @@ export default {
     // 弹窗相关
     // 除非树形结构在操作列点击新增, 否则 row 都是 undefined
     onDefaultNew(row = {}) {
-      if (this.onNew) {
-        return this.onNew(row)
-      }
-      /**
-       * 点击新增 触发new事件
-       * @event new
-       */
-      this.$emit('new', row)
-
       this.row = row
       this.isNew = true
       this.isEdit = false
@@ -806,21 +809,13 @@ export default {
       this.dialogVisible = true
     },
     onDefaultView(row) {
-      if (this.onView) {
-        return this.onView(row)
-      }
-      /**
-       * 点击查看 触发view事件
-       * @event view
-       */
-      this.$emit('view', row)
-
       this.row = row
       this.isView = true
       this.isNew = false
       this.isEdit = false
       this.dialogTitle = this.dialogViewTitle
       this.dialogVisible = true
+
       // 给表单填充值
       this.$nextTick(() => {
         this.form.forEach(entry => {
@@ -831,15 +826,6 @@ export default {
       })
     },
     onDefaultEdit(row) {
-      if (this.onEdit) {
-        return this.onEdit(row)
-      }
-      /**
-       * 点击修改 触发edit事件
-       * @event edit
-       */
-      this.$emit('edit', row)
-
       this.row = row
       this.isEdit = true
       this.isNew = false
@@ -860,15 +846,13 @@ export default {
       this.dialogVisible = false
     },
     confirm() {
-      if (!this.beforeConfirm()) return
+      if (this.isView) {
+        this.cancel()
+        return
+      }
 
       this.$refs[dialogForm].validate(valid => {
         if (!valid) return false
-
-        if (this.isView) {
-          this.cancel()
-          return
-        }
 
         let data = Object.assign(
           {},
@@ -876,45 +860,85 @@ export default {
           this.extraParams
         )
 
-        // 默认新增
-        let method = 'post'
-        let url = this.url + ''
-
-        if (this.isEdit) {
-          method = 'put'
-          url += `/${this.row[this.id]}`
-        }
-
         if (this.isTree) {
           if (this.isNew)
             data[this.treeParentKey] = this.row[this.treeParentValue]
-          else if (this.isEdit)
-            data[this.treeParentKey] = this.row[this.treeParentKey]
+          else data[this.treeParentKey] = this.row[this.treeParentKey]
         }
 
-        this.confirmLoading = true
-
-        this.$axios[method](url, data)
+        this.beforeConfirm(data, this.isNew)
           .then(resp => {
-            this.getList()
-            this.showMessage(true)
-            this.cancel()
+            let condiction = 'isNew'
+            let customMethod = 'onNew'
+
+            if (this.isEdit) {
+              condiction = 'isEdit'
+              customMethod = 'onEdit'
+            }
+
+            if (this[condiction] && this[customMethod]) {
+              this[customMethod](data, this.row)
+                .then(resp => {
+                  this.getList()
+                  this.showMessage(true)
+                  this.cancel()
+                })
+                .catch(e => {})
+              return
+            }
+
+            // 默认新增/修改逻辑
+            let method = 'post'
+            let url = this.url + ''
+
+            if (this.isEdit) {
+              method = 'put'
+              url += `/${this.row[this.id]}`
+            }
+
+            this.confirmLoading = true
+
+            this.$axios[method](url, data)
+              .then(resp => {
+                this.getList()
+                this.showMessage(true)
+                this.cancel()
+              })
+              .catch(err => {
+                this.confirmLoading = false
+              })
           })
-          .catch(err => {
-            this.confirmLoading = false
-          })
+          .catch(e => {})
       })
     },
     onDefaultDelete(row) {
-      if (this.onDelete) {
-        return this.onDelete(row)
-      }
       this.$confirm('确认删除吗', '提示', {
         type: 'warning',
         beforeClose: (action, instance, done) => {
           if (action == 'confirm') {
             instance.confirmButtonLoading = true
 
+            if (this.onDelete) {
+              this.onDelete(
+                this.hasSelect
+                  ? !this.single
+                    ? this.selected
+                    : this.selected[0]
+                  : row
+              )
+                .then(resp => {
+                  this.showMessage(true)
+                  done()
+                  this.getList()
+                })
+                .catch(e => {})
+                .finally(e => {
+                  instance.confirmButtonLoading = false
+                })
+              return
+            }
+
+            // 默认删除逻辑
             // 单个删除
             if (!this.hasSelect) {
               this.$axios
@@ -949,6 +973,21 @@ export default {
       }).catch(er => {
         /*取消*/
       })
+    },
+    onCustomButtonsClick(fn, parameter) {
+      if (!fn) return
+
+      this.customButtonsLoading = true
+
+      fn(parameter)
+        .then(flag => {
+          if (flag === false) return
+          this.getList()
+        })
+        .catch(e => {})
+        .finally(e => {
+          this.customButtonsLoading = false
+        })
     },
     // 树形table相关
     // https://github.com/PanJiaChen/vue-element-admin/tree/master/src/components/TreeTable
