@@ -96,7 +96,7 @@
       },
       /**
        * 查询字段渲染, 配置参考el-form-renderer
-       * @link https://github.com/leezng/el-form-renderer/blob/dev/README.zh-CN.md
+       * @link https://github.com/FEMessage/el-form-renderer/blob/master/README.md
        */
       searchForm: {
         type: Array,
@@ -334,7 +334,7 @@
       },
       /**
        * 弹窗表单, 用于新增与修改, 详情配置参考el-form-renderer
-       * @link https://github.com/leezng/el-form-renderer/blob/dev/README.zh-CN.md
+       * @link https://github.com/FEMessage/el-form-renderer/blob/master/README.md
        */
       form: {
         type: Array,
@@ -412,8 +412,6 @@
         this.getList();
       },
       dialogVisible: function(val, old) {
-        var this$1 = this;
-
         if (!val) {
           this.isNew = false;
           this.isEdit = false;
@@ -421,14 +419,6 @@
           this.confirmLoading = false;
 
           this.$refs[dialogForm].resetFields();
-
-          // fix element bug https://github.com/ElemeFE/element/issues/8615
-          // 重置select 为multiple==true时值为[undefined]
-          this.form.forEach(function (entry) {
-            if (entry.$type === 'select' && entry.$el && entry.$el.multiple) {
-              this$1.$refs[dialogForm].updateValue({id: entry.$id, value: []});
-            }
-          });
         }
       }
     },
@@ -454,10 +444,14 @@
           this.size = params.size * 1;
 
           // 对slot=search无效
-          Object.keys(params).forEach(function (k) {
-            if (k == 'page' || k == 'size') { return }
-            searchForm.updateValue({id: k, value: params[k]});
-          });
+          searchForm.updateForm(
+            Object.keys(params).reduce(function (acc, k) {
+              if (k !== 'page' && k !== 'size') {
+                acc[k] = params[k];
+              }
+              return acc
+            }, {})
+          );
         }
       }
 
@@ -676,11 +670,7 @@
 
         // 给表单填充值
         this.$nextTick(function () {
-          this$1.form.forEach(function (entry) {
-            var value = row[entry.$id];
-
-            this$1.$refs[dialogForm].updateValue({id: entry.$id, value: value});
-          });
+          this$1.$refs[dialogForm].updateForm(row);
         });
       },
       onDefaultEdit: function onDefaultEdit(row) {
@@ -695,11 +685,7 @@
 
         // 给表单填充值
         this.$nextTick(function () {
-          this$1.form.forEach(function (entry) {
-            var value = row[entry.$id];
-
-            this$1.$refs[dialogForm].updateValue({id: entry.$id, value: value});
-          });
+          this$1.$refs[dialogForm].updateForm(row);
         });
       },
       cancel: function cancel() {

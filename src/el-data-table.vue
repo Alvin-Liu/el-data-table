@@ -19,7 +19,7 @@
                            v-if="'show' in btn ? btn.show(selected) : true"
                            :disabled="'disabled' in btn ? btn.disabled(selected) : false"
                            @click="onCustomButtonsClick(btn.atClick, selected)"
-                           v-loading="customButtonsLoading"
+                           :loading="customButtonsLoading"
                            v-bind="btn"
                            :key="i"
                            size="small" >{{btn.text}}</el-button>
@@ -118,7 +118,7 @@
                     <el-button v-for="(btn, i) in extraButtons"
                                v-if="'show' in btn ? btn.show(scope.row) : true"
                                v-bind="btn" @click="onCustomButtonsClick(btn.atClick, scope.row)" :key="i" size="small"
-                               v-loading="customButtonsLoading"
+                               :loading="customButtonsLoading"
                     >
                         {{btn.text}}
                     </el-button>
@@ -154,7 +154,7 @@
 
             <div slot="footer" v-show="!isView">
                 <el-button @click="cancel" size="small">取 消</el-button>
-                <el-button type="primary" @click="confirm" v-loading="confirmLoading" size="small">确 定</el-button>
+                <el-button type="primary" @click="confirm" :loading="confirmLoading" size="small">确 定</el-button>
             </div>
         </el-dialog>
     </div>
@@ -574,14 +574,6 @@ export default {
         this.confirmLoading = false
 
         this.$refs[dialogForm].resetFields()
-
-        // fix element bug https://github.com/ElemeFE/element/issues/8615
-        // 重置select 为multiple==true时值为[undefined]
-        this.form.forEach(entry => {
-          if (entry.$type === 'select' && entry.$el && entry.$el.multiple) {
-            this.$refs[dialogForm].updateForm({id: entry.$id, value: []})
-          }
-        })
       }
     }
   },
@@ -605,10 +597,14 @@ export default {
         this.size = params.size * 1
 
         // 对slot=search无效
-        Object.keys(params).forEach(k => {
-          if (k == 'page' || k == 'size') return
-          searchForm.updateForm({id: k, value: params[k]})
-        })
+        searchForm.updateForm(
+          Object.keys(params).reduce((acc, k) => {
+            if (k !== 'page' && k !== 'size') {
+              acc[k] = params[k]
+            }
+            return acc
+          }, {})
+        )
       }
     }
 

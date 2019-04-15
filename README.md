@@ -1,5 +1,10 @@
 # el-data-table
 
+[![NPM Download](https://img.shields.io/npm/dm/el-data-table.svg)](https://www.npmjs.com/package/el-data-table)
+[![NPM Version](https://img.shields.io/npm/v/el-data-table.svg)](https://www.npmjs.com/package/el-data-table)
+[![NPM License](https://img.shields.io/npm/l/el-data-table.svg)](https://github.com/FEMessage/el-data-table/blob/master/LICENSE)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/FEMessage/el-data-table/pulls)
+
 使用`axios`自动发送请求，支持树形结构，支持分页，支持自定义查询, 自定义操作列, 让 RESTful 风格的 CRUD 更简单 👏
 
 auto requesting by `axios`, supports pagination, tree data structure, custom search, custom operation column, makes rest api easily 👏
@@ -18,16 +23,19 @@ auto requesting by `axios`, supports pagination, tree data structure, custom sea
   * **[basic](#basic)**
   * **[url and columns](#url-and-columns)**
   * **[searchForm](#searchForm)**
+  * **[formatter](#formatter)**
   * **[selection](#selection)**
   * **[headerButtons](#headerButtons)**
   * **[extraButtons](#extraButtons)**
   * **[beforeSearch](#beforeSearch)**
   * **[beforeConfirm](#beforeConfirm)**
+  * **[customQuery](#customQuery)**
+  * **[extraParams](#extraParams)**
   * **[onNew](#onNew)**
   * **[onEdit](#onEdit)**
   * **[onDelete](#onDelete)**
 * **[Reference](#reference)**
-* **[License](license)**
+* **[License](#license)**
 
 ## Introduction
 
@@ -212,7 +220,7 @@ cd el-data-table
 yarn
 
 # run demo in ./stories
-yarn storybook
+yarn story
 ```
 
 [⬆ Back to Top](#table-of-contents)
@@ -270,6 +278,7 @@ import {
   Pagination,
   Table,
   TableColumn,
+  Message,
   MessageBox
 } from 'element-ui'
 
@@ -286,6 +295,10 @@ Vue.component('el-data-table', ElDataTable)
 
 // to show confirm before delete
 Vue.prototype.$confirm = MessageBox.confirm
+
+// show tips
+Vue.prototype.$message = Message
+
 // if the table component cannot access `this.$axios`, it cannot send request
 import axios from 'axios'
 Vue.prototype.$axios = axios
@@ -464,6 +477,39 @@ searchForm: [
 ```
 
 ![searchForm](assets/image-20181106224933515.png)
+
+[⬆ Back to Top](#table-of-contents)
+
+### formatter
+
+```vue
+<!-- template -->
+<el-data-table
+  :url="url"
+  :columns="columns"
+>
+```
+
+```js
+// script
+columns: [
+  // formatter: you can return the jsx syntax
+  {
+    prop: 'imageUrl',
+    label: '商品图片',
+    formatter: row => (
+      <div>
+        <img
+          src={row.imageUrl}
+          onClick={this.handlePreviewUrl.bind(this, row.imageUrl)}
+        />
+      </div>
+    )
+  }
+]
+```
+
+![selection](https://i.screenshot.net/wj600hn)
 
 [⬆ Back to Top](#table-of-contents)
 
@@ -648,6 +694,35 @@ beforeConfirm(data, isNew) {
 
 [⬆ Back to Top](#table-of-contents)
 
+### customQuery
+
+查询时，在 url 上添加额外的参数
+
+```js
+customQuery: {
+  type: 1
+}
+```
+
+[⬆ Back to Top](#table-of-contents)
+
+假设`url`参数配置为`/api/v1/users`
+
+则实际查询请求为：`/api/v1/users?type=1`
+
+### extraParams
+
+新增/修改请求时，在 body 里添加额外的参数
+
+```js
+extraParams: {
+  version: 0,
+  isTree: false
+}
+```
+
+[⬆ Back to Top](#table-of-contents)
+
 ### onNew
 
 默认情况下, 新增的请求格式是 POST url body
@@ -745,23 +820,6 @@ onDelete: row => {
 ```
 
 [⬆ Back to Top](#table-of-contents)
-
-### extraParams on new/edit
-
-```js
-extraParams: {
-  version: 0,
-  isTree: false
-}
-```
-
-### customQuery on search
-
-```js
-customQuery: {
-  type: this.$route.query.type
-}
-```
 
 ## Reference
 
